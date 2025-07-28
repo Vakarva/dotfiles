@@ -1,1 +1,1 @@
-setopt no_global_rcs
+# setopt no_global_rcs
