@@ -1,20 +1,43 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
+function zcompile-many() {
+  local f
+  for f; do zcompile -R -- "$f".zwc "$f"; done
+}
+
+# Clone and compile to wordcode missing plugins.
+if [[ ! -e ~/.zsh/fzf-tab/ ]]; then
+  git clone --depth=1 https://github.com/Aloxaf/fzf-tab ~/.zsh/fzf-tab
+  zcompile-many ~/.zsh/fzf-tab/{fzf-tab.zsh,fzf-tab.plugin.zsh,lib/zsh-ls-colors/ls-colors.zsh}
+fi
+if [[ ! -e ~/.zsh/zsh-syntax-highlighting ]]; then
+  git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.zsh/zsh-syntax-highlighting
+  zcompile-many ~/.zsh/zsh-syntax-highlighting/{zsh-syntax-highlighting.zsh,highlighters/*/*.zsh}
+fi
+if [[ ! -e ~/.zsh/zsh-autosuggestions ]]; then
+  git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git ~/.zsh/zsh-autosuggestions
+  zcompile-many ~/.zsh/zsh-autosuggestions/{zsh-autosuggestions.zsh,src/**/*.zsh}
+fi
+if [[ ! -e ~/.zsh/powerlevel10k ]]; then
+  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.zsh/powerlevel10k
+  make -C ~/.zsh/powerlevel10k pkg
+fi
+
+# Activate Powerlevel10k Instant Prompt.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-source ~/.zsh/powerlevel10k/powerlevel10k.zsh-theme
-
 # Autoload functions.
 autoload -U compinit; compinit
+[[ ~/.zcompdump.zwc -nt ~/.zcompdump ]] || zcompile-many ~/.zcompdump
+unfunction zcompile-many
 autoload -Uz zmv
 
 # Plugins
 source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
-source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+source ~/.zsh/powerlevel10k/powerlevel10k.zsh-theme
+source ~/.p10k.zsh
 
 # Path modifications
 . "$HOME/.local/bin/env"
@@ -94,5 +117,3 @@ load-nvmrc
 # uv shell autocompletion
 eval "$(uv generate-shell-completion zsh)"
 eval "$(uvx --generate-shell-completion zsh)"
-
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
