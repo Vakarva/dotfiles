@@ -39,9 +39,6 @@ source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~/.zsh/powerlevel10k/powerlevel10k.zsh-theme
 source ~/.p10k.zsh
 
-# Path modifications
-. "$HOME/.local/bin/env"
-
 # Export environment variables.
 export GPG_TTY=$TTY
 
