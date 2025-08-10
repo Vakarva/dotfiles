@@ -1,45 +1,59 @@
-function zcompile-many() {
-  local f
-  for f; do zcompile -R -- "$f".zwc "$f"; done
-}
-
-# Clone and compile to wordcode missing plugins.
-if [[ ! -e ~/.zsh/fzf-tab/ ]]; then
-  git clone --depth=1 https://github.com/Aloxaf/fzf-tab ~/.zsh/fzf-tab
-  zcompile-many ~/.zsh/fzf-tab/{fzf-tab.zsh,fzf-tab.plugin.zsh,lib/zsh-ls-colors/ls-colors.zsh}
-fi
-if [[ ! -e ~/.zsh/zsh-syntax-highlighting ]]; then
-  git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.zsh/zsh-syntax-highlighting
-  zcompile-many ~/.zsh/zsh-syntax-highlighting/{zsh-syntax-highlighting.zsh,highlighters/*/*.zsh}
-fi
-if [[ ! -e ~/.zsh/zsh-autosuggestions ]]; then
-  git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git ~/.zsh/zsh-autosuggestions
-  zcompile-many ~/.zsh/zsh-autosuggestions/{zsh-autosuggestions.zsh,src/**/*.zsh}
-fi
-if [[ ! -e ~/.zsh/powerlevel10k ]]; then
-  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.zsh/powerlevel10k
-  make -C ~/.zsh/powerlevel10k pkg
-fi
-
 # Activate Powerlevel10k Instant Prompt.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# Autoload functions.
-autoload -Uz compinit && compinit
-[[ ~/.zcompdump.zwc -nt ~/.zcompdump ]] || zcompile-many ~/.zcompdump
-unfunction zcompile-many
-autoload -Uz zmv
-
-# Plugins
-source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
-source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
-source ~/.zsh/powerlevel10k/powerlevel10k.zsh-theme
+ZPLUGINDIR="$HOME/.config/zsh/plugins"
+# Refactored from https://github.com/mattmc3/zsh_unplugged
+function __plugin-compile() {
+    local f
+    for f in $@/**/*.zsh{,theme}(N.); do
+        [[ $f == */test*/* ]] && continue
+        echo "Compiling $f"
+        zcompile -R -- "$f"
+    done
+}
+function plugin-load() {
+    local repo plugdir initfile initfiles=()
+    for repo; do
+        plugdir=$ZPLUGINDIR/${repo:t}
+        initfile=$plugdir/${repo:t}.plugin.zsh
+        if [[ ! -d $plugdir ]]; then
+            echo "Cloning $repo..."
+            git clone -q --depth 1 --recursive --shallow-submodules https://github.com/$repo $plugdir
+            # Special handling for powerlevel10k
+            if [[ $repo == "romkatv/powerlevel10k" ]]; then
+                echo "Building $repo..."
+                make -C $plugdir pkg
+            fi
+            __plugin-compile $plugdir
+            if [[ ! -e $initfile ]]; then
+                initfiles=($plugdir/*.{zsh-theme,zsh,sh}(N))
+                (( $#initfiles )) || { echo >&2 "No init file '$repo'." && continue }
+                ln -sf $initfiles[1] $initfile
+            fi
+        fi
+        source $initfile
+    done
+}
+plugins=(
+    Aloxaf/fzf-tab
+    romkatv/powerlevel10k
+    zsh-users/zsh-autosuggestions
+    zsh-users/zsh-syntax-highlighting
+)
+plugin-load $plugins
+unfunction plugin-load
 source ~/.p10k.zsh
 
-# Export environment variables.
+# Enable the new completion system (compsys)
+autoload -Uz compinit && compinit
+[[ ~/.zcompdump.zwc -nt ~/.zcompdump ]] || zcompile -R ~/.zcompdump
+
+autoload -Uz zmv
+
+ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+
 export GPG_TTY=$TTY
 
 # fzf-tab configuration
@@ -110,3 +124,12 @@ load-nvmrc
 # uv shell autocompletion
 eval "$(uv generate-shell-completion zsh)"
 eval "$(uvx --generate-shell-completion zsh)"
+
+function zsh-plugin-update() {
+    for d in $ZPLUGINDIR/*/.git(/); do
+        plugdir=${d:h}
+        echo "Updating ${plugdir:t}..."
+        command git -C "$plugdir" pull --ff --recurse-submodules --depth 1 --rebase --autostash
+        __plugin-compile $plugdir
+    done
+}
