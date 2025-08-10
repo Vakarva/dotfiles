@@ -1,0 +1,5 @@
+clipboard-read = allow
+theme = ayu
+# download font from https://www.jetbrains.com/lp/mono/
+font-family = "JetBrains Mono"
+font-feature = -calt, -liga, -dlig
