@@ -122,6 +122,7 @@ load-nvmrc
 
 # FROM: https://docs.astral.sh/uv/getting-started/installation/#shell-autocompletion
 # uv shell autocompletion
+. "$HOME/.local/bin/env"
 eval "$(uv generate-shell-completion zsh)"
 eval "$(uvx --generate-shell-completion zsh)"
 

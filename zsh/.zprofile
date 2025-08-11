@@ -1,5 +1,3 @@
-emulate sh -c '. ~/.profile'
-
 # Homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
