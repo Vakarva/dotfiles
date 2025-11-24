@@ -3,4 +3,4 @@ theme = ayu
 # download font from https://www.jetbrains.com/lp/mono/
 font-family = "JetBrains Mono"
 font-feature = -calt, -liga, -dlig
-keybind = shift+enter=text:\n
+keybind = shift+enter=text:\x1b\r
