@@ -3,6 +3,9 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 export PATH=$PATH:$HOME/.local/bin
 
+# Go: install user binaries into ~/.local/bin
+export GOBIN=$HOME/.local/bin
+
 # Android Development
 export ANDROID_HOME=$HOME/Library/Android/sdk
 export PATH=$PATH:$ANDROID_HOME/emulator

@@ -100,3 +100,8 @@ function zsh-plugin-update() {
         __plugin-compile $plugdir
     done
 }
+
+# ZLE: vi navigation with normal insert-mode deletion
+bindkey -v
+bindkey -M viins '^?' backward-delete-char
+bindkey -M viins '^[[3~' delete-char
