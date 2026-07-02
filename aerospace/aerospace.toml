@@ -1,3 +1,5 @@
+config-version = 2
+
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
 after-startup-command = []
 
