@@ -42,17 +42,27 @@ plugins=(
     zsh-users/zsh-autosuggestions
     zsh-users/zsh-syntax-highlighting
 )
+# Enable the new completion system (compsys)
+# NOTE: fzf-tab requires compinit to run before it is loaded
+autoload -Uz compinit && compinit
+[[ ~/.zcompdump.zwc -nt ~/.zcompdump ]] || zcompile -R ~/.zcompdump
+
 plugin-load $plugins
 unfunction plugin-load
 source ~/.p10k.zsh
 
-# Enable the new completion system (compsys)
-autoload -Uz compinit && compinit
-[[ ~/.zcompdump.zwc -nt ~/.zcompdump ]] || zcompile -R ~/.zcompdump
-
 autoload -Uz zmv
 
 ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+
+# History
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
+setopt inc_append_history    # write to $HISTFILE as commands run, not at shell exit
+setopt hist_ignore_all_dups  # drop older duplicates of a repeated command
+setopt hist_ignore_space     # don't record commands with a leading space
+setopt extended_history      # record timestamp and duration of each command
 
 export GPG_TTY=$TTY
 
