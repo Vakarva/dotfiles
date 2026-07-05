@@ -64,8 +64,6 @@ setopt hist_ignore_all_dups  # drop older duplicates of a repeated command
 setopt hist_ignore_space     # don't record commands with a leading space
 setopt extended_history      # record timestamp and duration of each command
 
-export GPG_TTY=$TTY
-
 # fzf-tab configuration
 # disable sort when completing `git checkout`
 zstyle ':completion:*:git-checkout:*' sort false
