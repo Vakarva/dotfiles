@@ -4,7 +4,7 @@
             "complex_modifications": {
                 "rules": [
                     {
-                        "description": "Caps Lock: Escape on tap, Control on hold (no accidental prevention)",
+                        "description": "Left Control: Escape on tap, Control on hold (no accidental prevention)",
                         "manipulators": [
                             {
                                 "from": {
