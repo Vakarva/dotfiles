@@ -89,9 +89,6 @@ alias ls="${aliases[ls]:-ls} -A --color=auto"
 setopt glob_dots     # no special treatment for file names with a leading dot
 setopt no_auto_menu  # require an extra TAB press to open the completion menu
 
-# Initialize fnm (Fast Node Manager) environment
-eval "$(fnm env --use-on-cd --shell zsh)"
-
 function zsh-plugin-update() {
     for d in $ZPLUGINDIR/*/.git(/); do
         plugdir=${d:h}
@@ -105,3 +102,9 @@ function zsh-plugin-update() {
 bindkey -v
 bindkey -M viins '^?' backward-delete-char
 bindkey -M viins '^[[3~' delete-char
+
+autoload -U +X bashcompinit && bashcompinit
+# NOTE: bare command name so PATH resolves it at completion time (works with mise)
+complete -o nospace -C tofu tofu
+
+eval "$(mise activate zsh)"
