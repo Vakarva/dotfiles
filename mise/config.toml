@@ -1,2 +1,7 @@
+# node: the one language without native version management. The other
+# languages are owned by their native managers: go via brew + go.mod's
+# toolchain directive, python via uv, rust via rustup. Projects pin any
+# tool with `mise use <tool>@<version>` (shadows brew via PATH).
 [tools]
-node = "24"
+node = "26"
+tflint = "latest" # exception: no homebrew-core formula
